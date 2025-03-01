@@ -26,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getMail())
                 .password(user.getPassword())  // Doit être un mot de passe haché !
-                .authorities(new SimpleGrantedAuthority(user.getRole())) // 🔥 Utilise authorities() au lieu de roles()
+                .authorities(new SimpleGrantedAuthority(Integer.toString(user.getRole()))) // 🔥 Utilise authorities() au lieu de roles()
                 .build();
 
     }

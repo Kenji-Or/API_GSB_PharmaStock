@@ -2,6 +2,7 @@ package com.cours.api_gsbpharmastock.service;
 
 import com.cours.api_gsbpharmastock.model.User;
 import com.cours.api_gsbpharmastock.repository.UserRepository;
+import com.cours.api_gsbpharmastock.security.JwtUtil;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,8 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     public Optional<User> getUserById(final Long id) {
         return userRepository.findById(id);
@@ -29,6 +32,10 @@ public class UserService {
 
     public Optional<User> getUserByMail(final String mail) {
         return userRepository.findByMail(mail);
+    }
+
+    public Boolean validateToken(final String token, final String mail) {
+        return jwtUtil.validateToken(token, mail);
     }
 
     public void deleteUserById(final Long id) {

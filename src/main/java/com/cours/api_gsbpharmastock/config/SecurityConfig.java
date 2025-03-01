@@ -42,7 +42,6 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5000", "http://localhost:3000"));  // Frontend autorisé
         config.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "OPTIONS", "PATCH"));  // Méthodes autorisées
         config.setAllowedHeaders(Arrays.asList("*"));  // Autorisation de tous les headers
         config.setAllowCredentials(true);  // Permet d'envoyer des cookies et headers sécurisés

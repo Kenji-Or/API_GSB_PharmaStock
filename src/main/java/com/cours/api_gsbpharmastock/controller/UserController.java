@@ -1,4 +1,7 @@
 package com.cours.api_gsbpharmastock.controller;
+import com.cours.api_gsbpharmastock.repository.UserRepository;
+import com.cours.api_gsbpharmastock.security.CustomUserDetails;
+import com.cours.api_gsbpharmastock.security.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import com.cours.api_gsbpharmastock.dto.LoginRequest;
 import com.cours.api_gsbpharmastock.model.User;
@@ -7,7 +10,10 @@ import com.cours.api_gsbpharmastock.security.JwtUtil;
 import com.cours.api_gsbpharmastock.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,15 +31,43 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @GetMapping("/userId")
+    public ResponseEntity<?> getUserId(@RequestHeader("Authorization") String token) {
+        try {
+            String jwt = token.substring(7);
+            Long userId = jwtUtil.extractUserId(jwt);
+            Optional<User> userOptional = userService.getUserById(userId);
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                return ResponseEntity.ok().body(user); // Renvoie un JSON contenant l'utilisateur
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
+        }
+    }
+
     @GetMapping("/users")
     public Iterable<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/user/{id}")
-    public User getUserById(@PathVariable("id") final Long id) {
-        return userService.getUserById(id).orElse(null);
-    }
+//    @GetMapping("/user/{id}")
+//    public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
+//        Optional<User> user = userService.getUserById(id);
+//        if (user.isPresent()) {
+//            return ResponseEntity.ok().body(Map.of(
+//                    "firstName", user.get().getFirstName(),
+//                    "lastName", user.get().getLastName(),
+//                    "email", user.get().getMail(),
+//                    "role", user.get().getRole()
+//            ));
+//        } else {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
+//        }
+//    }
+
 
     @PostMapping("/user/register")
     public User saveUser(@RequestBody User user) {
@@ -48,7 +82,7 @@ public class UserController {
             User user = user1.get();
             if(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
                 // Générer un JWT
-                String token = jwtUtil.generateToken(user.getMail());
+                String token = jwtUtil.generateToken(user.getMail(), user.getId().toString(), Integer.toString(user.getRole()));
 
                 // Retourner le token
                 return ResponseEntity.ok().body(Map.of("token",token));
