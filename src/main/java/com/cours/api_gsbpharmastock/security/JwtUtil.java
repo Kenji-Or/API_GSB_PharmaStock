@@ -46,6 +46,20 @@ public class JwtUtil {
         return (mail.equals(extractEmail(token)) && !isTokenExpired(token));
     }
 
+    // Method to validate the token
+    public boolean isTokenValid(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return !claims.getExpiration().before(new java.util.Date());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public Long extractUserId(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
