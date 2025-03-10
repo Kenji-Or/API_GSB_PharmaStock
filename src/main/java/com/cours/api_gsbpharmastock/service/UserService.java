@@ -42,21 +42,34 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public User saveUser(User user) {
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            // Vérifie si le mot de passe a été modifié
-            if (user.getId() == null || !userRepository.existsById(user.getId())) {
-                // Si l'utilisateur n'a pas encore d'id (nouveau) ou si l'utilisateur n'existe pas en base
-                user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public User saveUser(User user, String newPassword) {
+        if (user.getId() != null && userRepository.existsById(user.getId())) {
+            // Récupération de l'utilisateur existant
+            User existingUser = userRepository.findById(user.getId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Si aucun mot de passe n'est fourni, on garde l'ancien mot de passe
+            if (newPassword == null || newPassword.isEmpty()) {
+                System.out.println("Aucun nouveau mot de passe fourni, on garde l'ancien hash.");
+                user.setPassword(existingUser.getPassword());
             } else {
-                // Si l'utilisateur existe et que le mot de passe n'a pas changé
-                User existingUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found"));
-                if (!user.getPassword().equals(existingUser.getPassword())) {
-                    user.setPassword(passwordEncoder.encode(user.getPassword()));
+                // Si le mot de passe a changé, on le re-hashe
+                if (!passwordEncoder.matches(newPassword, existingUser.getPassword())) {
+                    System.out.println("Mot de passe modifié, on le hash.");
+                    user.setPassword(passwordEncoder.encode(newPassword)); // Re-hash uniquement si modifié
+                } else {
+                    System.out.println("Le mot de passe est identique, on garde l'ancien hash.");
+                    user.setPassword(existingUser.getPassword()); // Garde l'ancien hash si inchangé
                 }
             }
+        } else {
+            // Nouvel utilisateur, on hash toujours le mot de passe
+            System.out.println("Nouveau compte, hashing du mot de passe...");
+            user.setPassword(passwordEncoder.encode(newPassword));
         }
-        User savedUser = userRepository.save(user);
-        return savedUser;
+
+        return userRepository.save(user);
     }
+
+
 }

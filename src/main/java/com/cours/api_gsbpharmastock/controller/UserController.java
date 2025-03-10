@@ -1,4 +1,5 @@
 package com.cours.api_gsbpharmastock.controller;
+import com.cours.api_gsbpharmastock.exception.UnauthorizedException;
 import com.cours.api_gsbpharmastock.repository.UserRepository;
 import com.cours.api_gsbpharmastock.security.CustomUserDetails;
 import com.cours.api_gsbpharmastock.security.CustomUserDetailsService;
@@ -32,17 +33,20 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @GetMapping("/user/userInfo")
-    public ResponseEntity<?> getUserId(@RequestHeader("Authorization") String token) {
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserId(@RequestHeader("Authorization") String token, @PathVariable("id") final Long userId) {
         try {
             String jwt = token.substring(7);
-            Long userId = jwtUtil.extractUserId(jwt);
-            Optional<User> userOptional = userService.getUserById(userId);
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
-                return ResponseEntity.ok().body(user); // Renvoie un JSON contenant l'utilisateur
+            if (jwtUtil.isTokenValid(jwt)) {
+                Optional<User> userOptional = userService.getUserById(userId);
+                if (userOptional.isPresent()) {
+                    User user = userOptional.get();
+                    return ResponseEntity.ok().body(user); // Renvoie un JSON contenant l'utilisateur
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
+                }
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
+                throw new UnauthorizedException("Invalid or expired token");
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
@@ -57,7 +61,7 @@ public class UserController {
 
     @PostMapping("/user/create")
     public User saveUser(@RequestBody User user) {
-        return userService.saveUser(user);
+        return userService.saveUser(user, user.getPassword());
     }
 
     @PostMapping("/user/login")
@@ -94,56 +98,65 @@ public class UserController {
         return ResponseEntity.ok().body("Logout effectué");
     }
 
-    @PatchMapping("/user/editUser")
-    public ResponseEntity<?> editUser(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> updates) {
+    @PatchMapping("/user/editUser/{id}")
+    public ResponseEntity<?> editUser(@RequestHeader("Authorization") String token, @PathVariable("id") final Long userId, @RequestBody Map<String, Object> updates) {
         try {
             String jwt = token.substring(7);
-            Long userId = jwtUtil.extractUserId(jwt);
-            Optional<User> u = userService.getUserById(userId);
-            if (u.isPresent()) {
-                User currentUser = u.get();
-                boolean emailChanged = false;
+            if (jwtUtil.isTokenValid(jwt)) {
+                Optional<User> u = userService.getUserById(userId);
+                if (u.isPresent()) {
+                    User currentUser = u.get();
+                    boolean emailChanged = false;
+                    boolean roleChanged = false;
 
-                if (updates.containsKey("firstName")) {
-                    currentUser.setFirstName((String) updates.get("firstName"));
-                }
-                if (updates.containsKey("lastName")) {
-                    currentUser.setLastName((String) updates.get("lastName"));
-                }
-                if (updates.containsKey("mail")) {
-                    currentUser.setMail((String) updates.get("mail"));
-                    emailChanged = true;
-                }
-                if (updates.containsKey("password")) {
-                    currentUser.setPassword((String) updates.get("password"));
-                }
+                    if (updates.containsKey("firstName")) {
+                        currentUser.setFirstName((String) updates.get("firstName"));
+                    }
+                    if (updates.containsKey("lastName")) {
+                        currentUser.setLastName((String) updates.get("lastName"));
+                    }
+                    if (updates.containsKey("mail")) {
+                        currentUser.setMail((String) updates.get("mail"));
+                        emailChanged = true;
+                    }
+                    if (updates.containsKey("role")) {
+                        currentUser.setRole((Integer) updates.get("role"));
+                        roleChanged = true;
+                    }
+                    String newPassword = null;
+                    if (updates.containsKey("password")) {
+                        newPassword = (String) updates.get("password");
+                    }
 
-                userService.saveUser(currentUser);
-                // Générer un nouveau token si l'email a changé
-                String newToken = emailChanged ? jwtUtil.generateToken(currentUser.getMail(), currentUser.getId().toString(), Integer.toString(currentUser.getRole())) : null;
-                // Construire la réponse JSON
-                Map<String, Object> response = new HashMap<>();
-                response.put("id", currentUser.getId());
-                response.put("firstName", currentUser.getFirstName());
-                response.put("lastName", currentUser.getLastName());
-                response.put("mail", currentUser.getMail());
-                response.put("role", currentUser.getRole());
-                if (newToken != null) {
-                    response.put("token", newToken);
-                    // ✅ Supprimer l'ancien token (optionnel, si tu as un système de token store)
-                    Blacklist.addToken(token);
+                    userService.saveUser(currentUser, newPassword);
+                    // Générer un nouveau token si l'email a changé
+                    String newToken = emailChanged || roleChanged ? jwtUtil.generateToken(currentUser.getMail(), currentUser.getId().toString(), Integer.toString(currentUser.getRole())) : null;
+                    // Construire la réponse JSON
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("id", currentUser.getId());
+                    response.put("firstName", currentUser.getFirstName());
+                    response.put("lastName", currentUser.getLastName());
+                    response.put("mail", currentUser.getMail());
+                    response.put("role", currentUser.getRole());
+                    if (newToken != null) {
+                        response.put("token", newToken);
+                        // ✅ Supprimer l'ancien token (optionnel, si tu as un système de token store)
+                        Blacklist.addToken(token);
+                    }
+                    return ResponseEntity.ok(response);
+                } else {
+                    return ResponseEntity.notFound().build();
                 }
-                return ResponseEntity.ok(response);
             } else {
-                return ResponseEntity.notFound().build();
+                throw new UnauthorizedException("Invalid or expired token");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur invalide");
         }
     }
 
 
-    @DeleteMapping("/deleteuser/{id}")
+    @DeleteMapping("/user/delete/{id}")
     public void deleteUserById(@PathVariable("id") final Long id) {
         userService.deleteUserById(id);
     }
