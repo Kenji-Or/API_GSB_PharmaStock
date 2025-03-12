@@ -22,7 +22,7 @@ public class CategoryController {
     }
 
     @GetMapping("/category/{id}")
-    public Optional<Category> getCategory(@PathVariable Long id) {
+    public Optional<Category> getCategory(@PathVariable int id) {
         return categoryService.findById(id);
     }
 
@@ -32,7 +32,7 @@ public class CategoryController {
     }
 
     @PatchMapping("/category/{id}")
-    public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<?> updateCategory(@PathVariable int id, @RequestBody Map<String, Object> updates) {
         Optional<Category> categoryOptional = categoryService.findById(id);
         if (categoryOptional.isPresent()) {
             Category currentCategory = categoryOptional.get();
@@ -45,7 +45,7 @@ public class CategoryController {
 
             // Construire la réponse JSON
             Map<String, Object> response = new HashMap<>();
-            response.put("id", currentCategory.getId());
+            response.put("id", currentCategory.getId_category());
             response.put("name", currentCategory.getName());
             return ResponseEntity.ok(response);
         } else {
@@ -54,7 +54,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/category/{id}")
-    public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<?> deleteCategory(@PathVariable int id) {
         Optional<Category> categoryOptional = categoryService.findById(id);
         if (categoryOptional.isPresent()) {
             categoryService.deleteCategory(categoryOptional.get());

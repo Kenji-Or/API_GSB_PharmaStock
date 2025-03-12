@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -45,10 +44,10 @@ public class MedicamentController {
                 currentMedicament.setQuantity((int) updates.get("quantity"));
             }
             if (updates.containsKey("category")) {
-                currentMedicament.setCategory((Long) updates.get("category"));
+                currentMedicament.setCategory((int) updates.get("category"));
             }
             if (updates.containsKey("date_expiration")) {
-                currentMedicament.setDate_expiration((LocalDate) updates.get("date_expiration"));
+                currentMedicament.setDate_expiration((String) updates.get("date_expiration"));
             }
             if (updates.containsKey("alerte_stock")) {
                 currentMedicament.setAlerte_stock((int) updates.get("alerte_stock"));

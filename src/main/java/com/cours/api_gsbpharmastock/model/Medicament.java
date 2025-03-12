@@ -4,8 +4,6 @@ package com.cours.api_gsbpharmastock.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDate;
-
 
 @Data
 @Entity
@@ -22,10 +20,10 @@ public class Medicament {
     private int quantity;
 
     @Column(nullable = false)
-    private Long category;
+    private int category;
 
     @Column(name = "date_expiration")
-    private LocalDate date_expiration;
+    private String date_expiration;
 
     @Column(name = "alerte_stock")
     private int alerte_stock;
