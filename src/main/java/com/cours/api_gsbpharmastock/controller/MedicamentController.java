@@ -41,16 +41,16 @@ public class MedicamentController {
                 currentMedicament.setName((String) updates.get("name"));
             }
             if (updates.containsKey("quantity")) {
-                currentMedicament.setQuantity((int) updates.get("quantity"));
+                currentMedicament.setQuantity((Integer) updates.get("quantity"));
             }
             if (updates.containsKey("category")) {
-                currentMedicament.setCategory((int) updates.get("category"));
+                currentMedicament.setCategory((Integer) updates.get("category"));
             }
             if (updates.containsKey("date_expiration")) {
                 currentMedicament.setDate_expiration((String) updates.get("date_expiration"));
             }
             if (updates.containsKey("alerte_stock")) {
-                currentMedicament.setAlerte_stock((int) updates.get("alerte_stock"));
+                currentMedicament.setAlerte_stock((Integer) updates.get("alerte_stock"));
             }
             medicamentService.saveMedicament(currentMedicament);
 
