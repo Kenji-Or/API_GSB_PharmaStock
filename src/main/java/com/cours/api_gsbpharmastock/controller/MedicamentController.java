@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,6 +25,11 @@ public class MedicamentController {
     @GetMapping("/medicament/{id}")
     public Optional<Medicament> getMedicamentById(@PathVariable Long id) {
         return medicamentService.getMedicamentById(id);
+    }
+
+    @GetMapping("/medicament/dateexpiration")
+    public List<Medicament> getMedicamentDateExpiration() {
+        return medicamentService.getMedicamentsExpiringInOneMonth();
     }
 
     @PostMapping("/medicament/create")
