@@ -37,6 +37,11 @@ public class MedicamentController {
         return medicamentService.getMedicamentsByCategory(category);
     }
 
+    @GetMapping("medicament/alertstock")
+    public List<Medicament> getMedicamentEnAlerteStock() {
+        return medicamentService.getMedicamentsEnRupture();
+    }
+
     @PostMapping("/medicament/create")
     public Medicament createMedicament(@RequestBody Medicament medicament) {
         return medicamentService.saveMedicament(medicament);

@@ -75,6 +75,10 @@ public class MedicamentService {
         return medicamentRepository.findMedicamentsByCategory(category);
     }
 
+    public List<Medicament> getMedicamentsEnRupture() {
+        return medicamentRepository.findMedicamentsEnRupture();
+    }
+
     public Medicament saveMedicament(final Medicament medicament) {
         return medicamentRepository.save(medicament);
     }
