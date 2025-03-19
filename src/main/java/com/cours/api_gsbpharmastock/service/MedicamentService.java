@@ -71,7 +71,7 @@ public class MedicamentService {
         return null; // Si aucun format ne correspond
     }
 
-    public Iterable<Medicament> getMedicamentsByCategory(final Category category) {
+    public Iterable<Medicament> getMedicamentsByCategory(final int category) {
         return medicamentRepository.findMedicamentsByCategory(category);
     }
 

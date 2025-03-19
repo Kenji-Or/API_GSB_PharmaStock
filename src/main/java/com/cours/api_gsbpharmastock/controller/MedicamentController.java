@@ -32,6 +32,11 @@ public class MedicamentController {
         return medicamentService.getMedicamentsExpiringInOneMonth();
     }
 
+    @GetMapping("/medicament/categorie/{category}")
+    public Iterable<Medicament> getMedicamentByCategory(@PathVariable int category) {
+        return medicamentService.getMedicamentsByCategory(category);
+    }
+
     @PostMapping("/medicament/create")
     public Medicament createMedicament(@RequestBody Medicament medicament) {
         return medicamentService.saveMedicament(medicament);
