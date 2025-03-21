@@ -40,8 +40,8 @@ public class MedicamentService {
                     try {
                         LocalDate expirationDate = parseExpirationDate(med.getDate_expiration());
                         return expirationDate != null &&
-                                (expirationDate.isAfter(today) || expirationDate.isEqual(today)) &&
-                                expirationDate.isBefore(oneMonthLater.plusDays(1));
+                                (expirationDate.isBefore(today) ||  // Medicament expiré
+                                expirationDate.isBefore(oneMonthLater.plusDays(1))); // Médicament expirant dans 1 mois
                     } catch (Exception e) {
                         return false; // Ignorer si la date est invalide
                     }
