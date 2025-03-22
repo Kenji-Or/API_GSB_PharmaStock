@@ -1,7 +1,6 @@
 package com.cours.api_gsbpharmastock.service;
 
 
-import com.cours.api_gsbpharmastock.model.Category;
 import com.cours.api_gsbpharmastock.model.Medicament;
 import com.cours.api_gsbpharmastock.repository.MedicamentRepository;
 import lombok.Data;

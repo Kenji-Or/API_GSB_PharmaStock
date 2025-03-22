@@ -1,8 +1,5 @@
 package com.cours.api_gsbpharmastock.controller;
 import com.cours.api_gsbpharmastock.exception.UnauthorizedException;
-import com.cours.api_gsbpharmastock.repository.UserRepository;
-import com.cours.api_gsbpharmastock.security.CustomUserDetails;
-import com.cours.api_gsbpharmastock.security.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import com.cours.api_gsbpharmastock.dto.LoginRequest;
 import com.cours.api_gsbpharmastock.model.User;
@@ -13,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -106,6 +101,7 @@ public class UserController {
                 Optional<User> u = userService.getUserById(userId);
                 if (u.isPresent()) {
                     User currentUser = u.get();
+                    boolean adminEditUser = !jwtUtil.extractEmail(jwt).equals(currentUser.getMail());
                     boolean emailChanged = false;
                     boolean roleChanged = false;
 
@@ -130,7 +126,7 @@ public class UserController {
 
                     userService.saveUser(currentUser, newPassword);
                     // Générer un nouveau token si l'email a changé
-                    String newToken = emailChanged || roleChanged ? jwtUtil.generateToken(currentUser.getMail(), currentUser.getId().toString(), Integer.toString(currentUser.getRole())) : null;
+                    String newToken = (emailChanged || roleChanged) && !adminEditUser ? jwtUtil.generateToken(currentUser.getMail(), currentUser.getId().toString(), Integer.toString(currentUser.getRole())) : null;
                     // Construire la réponse JSON
                     Map<String, Object> response = new HashMap<>();
                     response.put("id", currentUser.getId());
@@ -140,7 +136,7 @@ public class UserController {
                     response.put("role", currentUser.getRole());
                     if (newToken != null) {
                         response.put("token", newToken);
-                        // ✅ Supprimer l'ancien token (optionnel, si tu as un système de token store)
+                        // Supprimer l'ancien token
                         Blacklist.addToken(token);
                     }
                     return ResponseEntity.ok(response);
