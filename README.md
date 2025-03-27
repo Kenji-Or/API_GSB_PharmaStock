@@ -1,6 +1,6 @@
 ### 🏥 API GSB PharmaStock
 Créé par : Kenji Ogier
-Date : 31/12/2024
+Date : 27/03/2025
 
 ### 📌 Description
 L’API GSB PharmaStock est une API REST conçue pour gérer les stocks de médicaments du laboratoire Galaxy Swiss Bourdin (GSB).
@@ -24,11 +24,12 @@ Maven
 ### 🛠️ Installation et configuration
 📥 Prérequis
 Avant d’installer l’API, assure-toi d’avoir :
+```textplain
 ✔️ Java 17 installé
 ✔️ MySQL 9.2 en service
 ✔️ Maven installé
 ✔️ Postman (optionnel pour tester les endpoints)
-
+```
 
 ### 🔧 Étapes d’installation
 1. **Cloner le projet :**
