@@ -5,9 +5,13 @@ Date : 27/03/2025
 ### 📌 Description
 L’API GSB PharmaStock est une API REST conçue pour gérer les stocks de médicaments du laboratoire Galaxy Swiss Bourdin (GSB).
 Elle assure :
+
 ✔️ La gestion des médicaments (ajout, modification, suppression, consultation)
+
 ✔️ La gestion des utilisateurs avec rôles (utilisateur, administrateur)
+
 ✔️ Un système d’alertes pour prévenir des stocks bas et des dates de péremption
+
 ✔️ Un système d’authentification sécurisé avec JWT
 
 ### 🚀 Technologies utilisées
@@ -39,7 +43,7 @@ Avant d’installer l’API, assure-toi d’avoir :
    ```
 2. **Configurer l'API :**
    Modifier application.properties avec votre jwt secret.
-   ```bash
+   ```properties
    spring.application.name=API_GSBPharmaStock
    spring.datasource.url=jdbc:mysql://localhost:3306/api_gsb
    spring.datasource.username=root
@@ -98,3 +102,6 @@ L’API utilise JWT pour sécuriser les endpoints.
 ┣ 📄 .gitignore                    
 ┗ 📄 pom.xml → Dépendances Maven
 ```
+
+### 🖥️Application mobile
+👉 Lien vers le dépôt de l'application mobile nécessaire au fonctionnement de l'API : [PharmaStockGSB](https://github.com/Kenji-Or/PharmaStockGSB)
